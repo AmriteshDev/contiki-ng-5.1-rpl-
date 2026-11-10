@@ -1,15 +1,20 @@
 CONTIKI_PROJECT = coap-example-server
 all: $(CONTIKI_PROJECT)
 
-# Do not try to build on Sky because of code size limitation
-PLATFORMS_EXCLUDE = sky z1
-
-# Include CoAP resources
-MODULES_REL += ./resources
 
 CONTIKI=../../..
 
-# Include the CoAP implementation
+# Force Contiki-NG to load your custom configuration header
+CFLAGS += -DPROJECT_CONF_H=\"project-conf.h\"
+
+MODULES += os/services/simple-energest
+
+
+MAKE_MAC = MAKE_MAC_TSCH
+MODULES += os/services/orchestra
+
+
+
 include $(CONTIKI)/Makefile.dir-variables
 MODULES += $(CONTIKI_NG_APP_LAYER_DIR)/coap
 

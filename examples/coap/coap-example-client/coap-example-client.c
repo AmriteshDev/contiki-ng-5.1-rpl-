@@ -1,159 +1,156 @@
-/*
- * Copyright (c) 2013, Institute for Pervasive Computing, ETH Zurich
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the Institute nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- * This file is part of the Contiki operating system.
- */
-
-/**
- * \file
- *      Erbium (Er) CoAP client example.
- * \author
- *      Matthias Kovatsch <kovatsch@inf.ethz.ch>
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "contiki.h"
 #include "contiki-net.h"
+
 #include "coap-engine.h"
 #include "coap-blocking-api.h"
-#if PLATFORM_SUPPORTS_BUTTON_HAL
-#include "dev/button-hal.h"
-#else
-#include "dev/button-sensor.h"
-#endif
+#include "sys/node-id.h"
 
-/* Log configuration */
-#include "coap-log.h"
-#define LOG_MODULE "App"
-#define LOG_LEVEL  LOG_LEVEL_APP
+#include "net/netstack.h"
+#include "net/mac/tsch/tsch.h"
+#include "net/routing/routing.h"
+// #include "net/mac/tsch/tsch-queue.h"
+// #include "net/queuebuf.h"
 
-/* FIXME: This server address is hard-coded for Cooja and link-local for unconnected border router. */
-#define SERVER_EP "coap://[fe80::212:7402:0002:0202]"
+#include "lib/random.h"
 
-#define TOGGLE_INTERVAL 10
+#define LOG_MODULE "CLIENT"
+#define LOG_LEVEL LOG_LEVEL_INFO
 
+#define SERVER_EP "coap://[fd00::201:1:1:1]"
+
+#define TOGGLE_INTERVAL (60 * CLOCK_SECOND)
+
+/*---------------------------------------------------------------------------*/
 PROCESS(er_example_client, "Erbium Example Client");
 AUTOSTART_PROCESSES(&er_example_client);
 
-static struct etimer et;
+static struct etimer periodic_timer;
+static struct etimer warmup_timer;
 
-/* Example URIs that can be queried. */
-#define NUMBER_OF_URLS 4
-/* leading and ending slashes only for demo purposes, get cropped automatically when setting the Uri-Path */
-char *service_urls[NUMBER_OF_URLS] =
-{ ".well-known/core", "/actuators/toggle", "battery/", "error/in//path" };
-#if PLATFORM_HAS_BUTTON
-static int uri_switch = 0;
-#endif
+static uint32_t total_sent = 0;
+static uint32_t total_received = 0;
+static clock_time_t send_time;
 
-/* This function is will be passed to COAP_BLOCKING_REQUEST() to handle responses. */
-void
-client_chunk_handler(coap_message_t *response)
+void client_chunk_handler(coap_message_t *response)
 {
-  const uint8_t *chunk;
-
-  if(response == NULL) {
-    puts("Request timed out");
+  if (response == NULL)
+  {
+    printf("Request Timed Out (No ACK received)\n");
+    printf("[METRIC] TIMEOUT : node=%u | Sent: %u | Acked: %u\n", node_id, total_sent, total_received);
     return;
   }
+  /* 1. Update received count */
+  total_received++;
 
+  /* 2. Calculate Delay (RTT) */
+  clock_time_t delay_ticks = clock_time() - send_time;
+  uint32_t delay_ms = (uint32_t)(((uint64_t)delay_ticks * 1000) / CLOCK_SECOND);
+
+  const uint8_t *chunk;
   int len = coap_get_payload(response, &chunk);
 
-  printf("|%.*s", len, (char *)chunk);
+  printf("Server Reply: %.*s\n", len, (char *)chunk);
+
+  /* 3. Sirf RTT aur Raw Counts print karein */
+  printf("[METRIC] SUCCESS: node=%u | RTT: %u ms | Sent: %u | Acked: %u\n",
+         node_id, delay_ms, total_sent, total_received);
 }
+
 PROCESS_THREAD(er_example_client, ev, data)
 {
   static coap_endpoint_t server_ep;
+  static coap_message_t request[1];
+
   PROCESS_BEGIN();
 
-  static coap_message_t request[1];      /* This way the packet can be treated as pointer as usual. */
+  /* =================================================================== */
+  /* 1. NETWORK WARMUP DELAY (300 SECONDS)                               */
+  /* =================================================================== */
 
+  etimer_set(&warmup_timer, 600 * CLOCK_SECOND);
+  PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&warmup_timer));
+  /* =================================================================== */
+  /* =================================================================== */
+
+  LOG_INFO("Starting 6TiSCH CoAP Client\n");
+
+  /* Parse server endpoint */
   coap_endpoint_parse(SERVER_EP, strlen(SERVER_EP), &server_ep);
 
-  etimer_set(&et, TOGGLE_INTERVAL * CLOCK_SECOND);
+  /* Start periodic timer */
 
-#if PLATFORM_HAS_BUTTON
-#if !PLATFORM_SUPPORTS_BUTTON_HAL
-  SENSORS_ACTIVATE(button_sensor);
-#endif
-  printf("Press a button to request %s\n", service_urls[uri_switch]);
-#endif /* PLATFORM_HAS_BUTTON */
+  // etimer_set(&periodic_timer, random_rand() % TOGGLE_INTERVAL);
+  /* Spread initial requests randomly over the first 60 seconds */
 
-  while(1) {
-    PROCESS_YIELD();
+  // etimer_set(&periodic_timer, random_rand() % TOGGLE_INTERVAL);
 
-    if(etimer_expired(&et)) {
-      printf("--Toggle timer--\n");
+  /* REPLACED: Added full random exponential jitter to shape traffic footprints */
+  uint32_t random_jitter = random_rand() % (60 * CLOCK_SECOND);
+  etimer_set(&periodic_timer, TOGGLE_INTERVAL + random_jitter);
 
-      /* prepare request, TID is set by COAP_BLOCKING_REQUEST() */
+  while (1)
+  {
+
+    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&periodic_timer));
+
+    /* Check network connectivity (6TiSCH routing) */
+    if (tsch_is_associated && NETSTACK_ROUTING.node_is_reachable())
+    {
+
+      // printf("\n--- Sending CON POST Request to Server ---\n");
+
+      /* Initialize CoAP message as Confirmable POST */
       coap_init_message(request, COAP_TYPE_CON, COAP_POST, 0);
-      coap_set_header_uri_path(request, service_urls[1]);
 
-      const char msg[] = "Toggle!";
+      /* Set URI path */
+      coap_set_header_uri_path(request, "test/hello");
 
-      coap_set_payload(request, (uint8_t *)msg, sizeof(msg) - 1);
+      /* Add Hello payload */
+      const char msg[] = "Hello Server!";
+      coap_set_payload(request, (uint8_t *)msg, strlen(msg));
 
-      LOG_INFO_COAP_EP(&server_ep);
-      LOG_INFO_("\n");
+      // /* NOW measure buffer — closer to actual send time */
+      // int tsch_global = tsch_queue_global_packet_count();
+      // int global_max = TSCH_QUEUE_NUM_PER_NEIGHBOR * TSCH_QUEUE_MAX_NEIGHBOR_QUEUES;
 
+      // struct tsch_neighbor *parent = tsch_queue_get_time_source();
+      // int parent_queue = 0;
+      // int parent_max = TSCH_QUEUE_NUM_PER_NEIGHBOR;
+
+      // if (parent == NULL)
+      // {
+      //   printf("[WARN] Node %u: No TSCH time source — parent queue invalid\n", node_id);
+      // }
+      // else
+      // {
+      //   parent_queue = tsch_queue_nbr_packet_count(parent);
+      // }
+
+      // printf("[STATS] Node %u: Global-Queue=%d/%d pkts | Parent-Queue=%d/%d pkts | Sent: %u | Acked: %u\n",
+      //        node_id, tsch_global, global_max,
+      //        parent_queue, parent_max,
+      //        total_sent, total_received);
+
+      total_sent++;
+      send_time = clock_time();
+
+      /* Send CoAP request and wait for ACK/Response */
       COAP_BLOCKING_REQUEST(&server_ep, request, client_chunk_handler);
 
-      printf("\n--Done--\n");
-
-      etimer_reset(&et);
-
-#if PLATFORM_HAS_BUTTON
-#if PLATFORM_SUPPORTS_BUTTON_HAL
-    } else if(ev == button_hal_release_event) {
-#else
-    } else if(ev == sensors_event && data == &button_sensor) {
-#endif
-
-      /* send a request to notify the end of the process */
-
-      coap_init_message(request, COAP_TYPE_CON, COAP_GET, 0);
-      coap_set_header_uri_path(request, service_urls[uri_switch]);
-
-      printf("--Requesting %s--\n", service_urls[uri_switch]);
-
-      LOG_INFO_COAP_EP(&server_ep);
-      LOG_INFO_("\n");
-
-      COAP_BLOCKING_REQUEST(&server_ep, request,
-                            client_chunk_handler);
-
-      printf("\n--Done--\n");
-
-      uri_switch = (uri_switch + 1) % NUMBER_OF_URLS;
-#endif /* PLATFORM_HAS_BUTTON */
+      printf("Request Finished \n");
     }
+    else
+    {
+      printf(" Network not reachable yet\n");
+    }
+
+    /* Restart timer */
+
+    etimer_set(&periodic_timer, TOGGLE_INTERVAL - CLOCK_SECOND + (random_rand() % (30 * CLOCK_SECOND)));
   }
 
   PROCESS_END();

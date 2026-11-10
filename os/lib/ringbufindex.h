@@ -43,9 +43,14 @@
 #include "contiki.h"
 
 struct ringbufindex {
-  uint8_t mask;
+  //uint8_t mask;
   /* These must be 8-bit quantities to avoid race conditions. */
-  uint8_t put_ptr, get_ptr;
+  // uint8_t put_ptr, get_ptr;
+  //  Amritesh
+  uint16_t mask;
+  /* These must be 16-bit quantities to avoid wrapping. */
+  uint16_t put_ptr, get_ptr;
+  //  Amritesh
 };
 
 /**
@@ -53,7 +58,8 @@ struct ringbufindex {
  * \param r Pointer to ringbufindex
  * \param size Size of ring buffer
  */
-void ringbufindex_init(struct ringbufindex *r, uint8_t size);
+//void ringbufindex_init(struct ringbufindex *r, uint8_t size);
+void ringbufindex_init(struct ringbufindex *r, uint16_t size);
 
 /**
  * \brief Put one element to the ring buffer

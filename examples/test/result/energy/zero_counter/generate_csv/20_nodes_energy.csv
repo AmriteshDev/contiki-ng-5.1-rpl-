@@ -1,0 +1,4 @@
+Run_Number,Nodes_Configured,Valid_Nodes_Found,Attacker_NodeID,Victim_NodeID,Avg_CPU(mJ),Avg_LPM(mJ),Avg_Deep_LPM(mJ),Avg_TX(mJ),Avg_RX(mJ),Avg_Network_Energy(mJ),Total_Network_Energy(mJ),Total_TX(mJ),Total_RX(mJ)
+1,21,20,21,3;17,52200.0,0.0,0.0,48.06,8698.273,60946.333,1218926.65,961.192,173965.458
+2,21,20,21,3;4,52200.0,0.0,0.0,47.711,8175.421,60423.133,1208462.651,954.221,163508.429
+3,21,20,21,3;4,52200.0,0.0,0.0,49.484,8588.05,60837.534,1216750.68,989.68,171761.0

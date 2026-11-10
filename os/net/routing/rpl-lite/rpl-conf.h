@@ -52,10 +52,10 @@
 /******************************************************************************/
 
 /* RPL Mode of operation */
-#ifdef  RPL_CONF_MOP
-#define RPL_MOP_DEFAULT                 RPL_CONF_MOP
+#ifdef RPL_CONF_MOP
+#define RPL_MOP_DEFAULT RPL_CONF_MOP
 #else /* RPL_CONF_MOP */
-#define RPL_MOP_DEFAULT                 RPL_MOP_NON_STORING
+#define RPL_MOP_DEFAULT RPL_MOP_NON_STORING
 #endif /* RPL_CONF_MOP */
 
 /*
@@ -211,9 +211,9 @@
  * ContikiRPL thus sets the default to 2^12 ms = 4.096 s.
  */
 #ifdef RPL_CONF_DIO_INTERVAL_MIN
-#define RPL_DIO_INTERVAL_MIN        RPL_CONF_DIO_INTERVAL_MIN
+#define RPL_DIO_INTERVAL_MIN RPL_CONF_DIO_INTERVAL_MIN
 #else
-#define RPL_DIO_INTERVAL_MIN        12
+#define RPL_DIO_INTERVAL_MIN 12
 #endif
 
 /*
@@ -224,9 +224,9 @@
  * unsuitable when we start with a minimum interval of 2^12.
  */
 #ifdef RPL_CONF_DIO_INTERVAL_DOUBLINGS
-#define RPL_DIO_INTERVAL_DOUBLINGS  RPL_CONF_DIO_INTERVAL_DOUBLINGS
+#define RPL_DIO_INTERVAL_DOUBLINGS RPL_CONF_DIO_INTERVAL_DOUBLINGS
 #else
-#define RPL_DIO_INTERVAL_DOUBLINGS  8
+#define RPL_DIO_INTERVAL_DOUBLINGS 8
 #endif
 
 /*
@@ -244,9 +244,9 @@
  * for reliable parent selection.
  */
 #ifdef RPL_CONF_DIO_REDUNDANCY
-#define RPL_DIO_REDUNDANCY          RPL_CONF_DIO_REDUNDANCY
+#define RPL_DIO_REDUNDANCY RPL_CONF_DIO_REDUNDANCY
 #else
-#define RPL_DIO_REDUNDANCY          0
+#define RPL_DIO_REDUNDANCY 0
 #endif
 
 /*
@@ -254,26 +254,26 @@
  * used in RPL lifetime values, in seconds.
  */
 #ifndef RPL_CONF_DEFAULT_LIFETIME_UNIT
-#define RPL_DEFAULT_LIFETIME_UNIT       60
+#define RPL_DEFAULT_LIFETIME_UNIT 60
 #else
-#define RPL_DEFAULT_LIFETIME_UNIT       RPL_CONF_DEFAULT_LIFETIME_UNIT
+#define RPL_DEFAULT_LIFETIME_UNIT RPL_CONF_DEFAULT_LIFETIME_UNIT
 #endif
 
 /*
  * Default route lifetime as a multiple of the lifetime unit.
  */
 #ifndef RPL_CONF_DEFAULT_LIFETIME
-#define RPL_DEFAULT_LIFETIME            30
+#define RPL_DEFAULT_LIFETIME 30
 #else
-#define RPL_DEFAULT_LIFETIME            RPL_CONF_DEFAULT_LIFETIME
+#define RPL_DEFAULT_LIFETIME RPL_CONF_DEFAULT_LIFETIME
 #endif
 
 /* Maximum lifetime of a DAG as a multiple of the lifetime unit. */
 #ifdef RPL_CONF_DAG_LIFETIME
-#define RPL_DAG_LIFETIME                RPL_CONF_DAG_LIFETIME
+#define RPL_DAG_LIFETIME RPL_CONF_DAG_LIFETIME
 #else
-#define RPL_DAG_LIFETIME                (8 * 60) /* 8 hours */
-#endif /* RPL_CONF_DAG_LIFETIME */
+#define RPL_DAG_LIFETIME (8 * 60) /* 8 hours */
+#endif                            /* RPL_CONF_DAG_LIFETIME */
 
 /*
  * RPL probing interval.
@@ -295,35 +295,35 @@
 
 /* Poisoining duration, before leaving the DAG  */
 #ifdef RPL_CONF_DELAY_BEFORE_LEAVING
-#define RPL_DELAY_BEFORE_LEAVING        RPL_CONF_DELAY_BEFORE_LEAVING
+#define RPL_DELAY_BEFORE_LEAVING RPL_CONF_DELAY_BEFORE_LEAVING
 #else
-#define RPL_DELAY_BEFORE_LEAVING        (5 * 60 * CLOCK_SECOND)
+#define RPL_DELAY_BEFORE_LEAVING (5 * 60 * CLOCK_SECOND)
 #endif
 
 /* Interval of DIS transmission  */
 #ifdef RPL_CONF_DIS_INTERVAL
-#define RPL_DIS_INTERVAL                RPL_CONF_DIS_INTERVAL
+#define RPL_DIS_INTERVAL RPL_CONF_DIS_INTERVAL
 #else
-#define RPL_DIS_INTERVAL                (30 * CLOCK_SECOND)
+#define RPL_DIS_INTERVAL (30 * CLOCK_SECOND)
 #endif
 
 /* DAO transmissions are always delayed by RPL_DAO_DELAY +/- RPL_DAO_DELAY/2 */
 #ifdef RPL_CONF_DAO_DELAY
-#define RPL_DAO_DELAY                 RPL_CONF_DAO_DELAY
+#define RPL_DAO_DELAY RPL_CONF_DAO_DELAY
 #else /* RPL_CONF_DAO_DELAY */
-#define RPL_DAO_DELAY                 (CLOCK_SECOND * 4)
+#define RPL_DAO_DELAY (CLOCK_SECOND * 4)
 #endif /* RPL_CONF_DAO_DELAY */
 
 #ifdef RPL_CONF_DAO_MAX_RETRANSMISSIONS
 #define RPL_DAO_MAX_RETRANSMISSIONS RPL_CONF_DAO_MAX_RETRANSMISSIONS
 #else
-#define RPL_DAO_MAX_RETRANSMISSIONS       5
+#define RPL_DAO_MAX_RETRANSMISSIONS 5
 #endif /* RPL_CONF_DAO_MAX_RETRANSMISSIONS */
 
 #ifdef RPL_CONF_DAO_RETRANSMISSION_TIMEOUT
-#define RPL_DAO_RETRANSMISSION_TIMEOUT  RPL_CONF_DAO_RETRANSMISSION_TIMEOUT
+#define RPL_DAO_RETRANSMISSION_TIMEOUT RPL_CONF_DAO_RETRANSMISSION_TIMEOUT
 #else
-#define RPL_DAO_RETRANSMISSION_TIMEOUT    (5 * CLOCK_SECOND)
+#define RPL_DAO_RETRANSMISSION_TIMEOUT (5 * CLOCK_SECOND)
 #endif /* RPL_CONF_DAO_RETRANSMISSION_TIMEOUT */
 
 /******************************************************************************/
@@ -340,47 +340,47 @@
  * ETX path cost. Larger values may also be desirable, as discussed
  * in section 6.1 of RFC6719. */
 #if RPL_OF_OCP == RPL_OCP_MRHOF
-#define RPL_MIN_HOPRANKINC          128
+#define RPL_MIN_HOPRANKINC 128
 #else /* RPL_OF_OCP == RPL_OCP_MRHOF */
-#define RPL_MIN_HOPRANKINC          256
+#define RPL_MIN_HOPRANKINC 256
 #endif /* RPL_OF_OCP == RPL_OCP_MRHOF */
-#else /* RPL_CONF_MIN_HOPRANKINC */
-#define RPL_MIN_HOPRANKINC          RPL_CONF_MIN_HOPRANKINC
+#else  /* RPL_CONF_MIN_HOPRANKINC */
+#define RPL_MIN_HOPRANKINC RPL_CONF_MIN_HOPRANKINC
 #endif /* RPL_CONF_MIN_HOPRANKINC */
 
 #ifndef RPL_CONF_MAX_RANKINC
-#define RPL_MAX_RANKINC             (8 * RPL_MIN_HOPRANKINC)
+#define RPL_MAX_RANKINC (8 * RPL_MIN_HOPRANKINC)
 #else /* RPL_CONF_MAX_RANKINC */
-#define RPL_MAX_RANKINC             RPL_CONF_MAX_RANKINC
+#define RPL_MAX_RANKINC RPL_CONF_MAX_RANKINC
 #endif /* RPL_CONF_MAX_RANKINC */
 
 #ifndef RPL_CONF_SIGNIFICANT_CHANGE_THRESHOLD
-#define RPL_SIGNIFICANT_CHANGE_THRESHOLD             (4 * RPL_MIN_HOPRANKINC)
+#define RPL_SIGNIFICANT_CHANGE_THRESHOLD (4 * RPL_MIN_HOPRANKINC)
 #else /* RPL_CONF_SIGNIFICANT_CHANGE_THRESHOLD */
-#define RPL_SIGNIFICANT_CHANGE_THRESHOLD             RPL_CONF_SIGNIFICANT_CHANGE_THRESHOLD
+#define RPL_SIGNIFICANT_CHANGE_THRESHOLD RPL_CONF_SIGNIFICANT_CHANGE_THRESHOLD
 #endif /* RPL_CONF_SIGNIFICANT_CHANGE_THRESHOLD */
 
 /* This value decides which DAG instance we should participate in by default. */
 #ifdef RPL_CONF_DEFAULT_INSTANCE
 #define RPL_DEFAULT_INSTANCE RPL_CONF_DEFAULT_INSTANCE
 #else
-#define RPL_DEFAULT_INSTANCE	          0 /* Default of 0 for compression */
-#endif /* RPL_CONF_DEFAULT_INSTANCE */
+#define RPL_DEFAULT_INSTANCE 0 /* Default of 0 for compression */
+#endif                         /* RPL_CONF_DEFAULT_INSTANCE */
 
 /* Set to have the root advertise a grounded DAG */
 #ifndef RPL_CONF_GROUNDED
-#define RPL_GROUNDED                    0
+#define RPL_GROUNDED 0
 #else
-#define RPL_GROUNDED                    RPL_CONF_GROUNDED
+#define RPL_GROUNDED RPL_CONF_GROUNDED
 #endif /* !RPL_CONF_GROUNDED */
 
 /*
  * DAG preference field
  */
 #ifdef RPL_CONF_PREFERENCE
-#define RPL_PREFERENCE              RPL_CONF_PREFERENCE
+#define RPL_PREFERENCE RPL_CONF_PREFERENCE
 #else
-#define RPL_PREFERENCE              0
+#define RPL_PREFERENCE 0
 #endif
 
 /* RPL callbacks when TSCH is enabled */
@@ -409,3 +409,48 @@
 /** @} */
 
 #endif /* RPL_CONF_H */
+
+/******************************************************************************/
+/****************Amritesh -- start          RPL Security **********************/
+/******************************************************************************/
+
+/*
+ * RPL Security
+ * = 0  : Unsecured Mode
+ * = 1  : Secure Mode
+ */
+#ifdef RPL_CONF_SECURITY
+#define RPL_SECURITY RPL_CONF_SECURITY
+#else /* Not enabled by user, disable security by default if not set, \
+         change to 1 if you want security enabled globally */
+#define RPL_SECURITY 1
+#endif
+
+/*
+ * RPL Pre-installed key for Secure Mode
+ */
+#if RPL_SECURITY
+
+#ifdef RPL_CONF_SECURITY_K
+#define RPL_SECURITY_K RPL_CONF_SECURITY_K
+#else
+#define RPL_SECURITY_K {0xF7, 0x8E, 0xBA, 0xC9, 0xED, 0xE3, 0xE6, 0x68, 0xDF, 0x15, 0x72, 0xE0, 0x78, 0xB7, 0x80, 0x9E}
+#endif
+
+/*
+ * RPL Security Level
+ * KIM = 0 in this implementation
+ * LVL = 0 : MAC-32 mode
+ * LVL = 1 : ENC-MAC-32 mode (default)
+ * LVL = 2 : MAC-64 mode
+ * LVL = 3 : ENC-MAC-64 mode
+ */
+#ifdef RPL_CONF_SEC_LVL
+#define RPL_SEC_LVL RPL_CONF_SEC_LVL
+#else
+#define RPL_SEC_LVL 1
+#endif
+
+#endif /* RPL_SECURITY */
+
+// Amritesh -- end

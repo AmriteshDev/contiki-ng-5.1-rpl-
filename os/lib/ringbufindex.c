@@ -47,7 +47,7 @@
 
 /* Initialize a ring buffer. The size must be a power of two */
 void
-ringbufindex_init(struct ringbufindex *r, uint8_t size)
+ringbufindex_init(struct ringbufindex *r, uint16_t size)
 {
   r->mask = size - 1;
   r->put_ptr = 0;

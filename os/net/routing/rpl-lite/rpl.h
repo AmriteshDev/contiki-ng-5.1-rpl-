@@ -87,13 +87,13 @@ void rpl_link_callback(const linkaddr_t *addr, int status, int numtx);
  */
 int rpl_set_prefix(rpl_prefix_t *prefix);
 /**
-* Set prefix from an IPv6 address
-*
-* \param addr The prefix
-* \param len The prefix length
-* \param flags The DIO prefix flags
-* \return 1 if success, 0 otherwise
-*/
+ * Set prefix from an IPv6 address
+ *
+ * \param addr The prefix
+ * \param len The prefix length
+ * \param flags The DIO prefix flags
+ * \return 1 if success, 0 otherwise
+ */
 
 int rpl_set_prefix_from_addr(uip_ipaddr_t *addr, unsigned len, uint8_t flags);
 
@@ -150,5 +150,13 @@ void rpl_set_leaf_only(uint8_t value);
  * \return The value of the rpl_leaf_only flag
  */
 uint8_t rpl_get_leaf_only(void);
+
+// Amritesh
+
+void cc_request_attack(void);
+
+void zero_counter_attack(void);
+
+// Amritesh
 
 #endif /* RPL_H */

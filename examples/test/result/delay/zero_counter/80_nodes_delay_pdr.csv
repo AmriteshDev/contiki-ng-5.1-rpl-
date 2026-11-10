@@ -1,0 +1,4 @@
+Run_Number,Total_Nodes,Valid_Nodes,Attacker_ID,Victim_ID,Avg_RTT(ms),Total_RTT(ms),Avg_PDR(%),Total_PDR(%),Buffer_Occupancy(%),Total_Sent,Total_Acked
+1,81,80,21,3;64,288.316,359818,100.0,100.0,0.0,1248,1248
+2,81,80,21,54,585.211,208335,50.391,62.129,0.0,573,356
+3,81,80,21,64,280.793,345094,99.819,99.838,0.0,1231,1229

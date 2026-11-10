@@ -1,0 +1,6 @@
+Nodes_Configured,Valid_Runs_Averaged,Overall_Avg_RTT(ms),Overall_Total_RTT(ms),Overall_Avg_PDR(%),Overall_Total_PDR(%),Overall_Buffer_Occupancy(%),Avg_Total_Sent,Avg_Total_Acked
+20,3,213.428,63536.333,100.0,100.0,0.0,298.0,298.0
+40,3,281.497,171745.0,100.0,100.0,0.0,610.0,610.0
+60,3,233.001,214147.0,99.435,99.782,0.0,921.7,919.7
+80,3,259.528,321126.667,99.916,99.946,0.0,1238.0,1237.3
+100,3,1858.099,483406.0,45.66,51.818,0.0,508.0,350.7
